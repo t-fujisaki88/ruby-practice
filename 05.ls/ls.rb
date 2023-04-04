@@ -92,18 +92,17 @@ def l_option(sorted_files)
     end
 
     print cmod.ljust(12)
-    print fs.nlink.to_s.rjust(nlink_brank)
-    print ' '
+    print fs.nlink.to_s.rjust(nlink_brank) + ' '
     print Etc.getpwuid(fs.uid).name.ljust(uid_brank)
     print Etc.getgrgid(fs.gid).name.ljust(gid_brank)
     print fs.size.to_s.rjust(filesize_brank)
     print MONTH_TABLE[fs.mtime.to_a.slice(4).to_s].rjust(4)
     print fs.mtime.to_a.slice(3).to_s.rjust(3)
-    print Time.now - fs.mtime < 15_552_000 ? fs.mtime.to_s.slice(11, 5).to_s.rjust(6) : fs.mtime.to_a.slice(5).to_s.rjust(6)
-    print ' '
+    print Time.now - fs.mtime < 15_552_000 ? fs.mtime.to_s.slice(11, 5).to_s.rjust(6) : fs.mtime.to_a.slice(5).to_s.rjust(6) + ' '
     print sorted_file
     puts
   end
+
 end
 
 opt = OptionParser.new
