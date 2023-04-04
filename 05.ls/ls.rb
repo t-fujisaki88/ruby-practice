@@ -53,7 +53,7 @@ def display(files, row)
   end
 end
 
-# lオプションの機能：詳細表示
+# lオプションの機能：全体
 def l_option(sorted_files)
   # ブロックの合計値
   total = sorted_files.size.times.sum do |i|
@@ -61,7 +61,7 @@ def l_option(sorted_files)
   end
   puts "total #{total}"
 
-  # 各項目の最大文字数を求める
+  # 各項目の最大文字数を求めるための一時記憶配列
   nlink_str_size = []
   uid_str_size = []
   gid_str_size = []
@@ -80,6 +80,11 @@ def l_option(sorted_files)
   gid_brank = gid_str_size.max + 1
   filesize_brank = filesize_str_size.max + 1
 
+  l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
+end
+
+# lオプションの機能：表示
+def l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
   # 表示
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
@@ -102,7 +107,6 @@ def l_option(sorted_files)
     print sorted_file
     puts
   end
-
 end
 
 opt = OptionParser.new
