@@ -83,7 +83,7 @@ def l_option(sorted_files)
   l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
 end
 
-# lオプションの機能：表示
+# lオプションの機能：文字列生成
 def l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
   # 表示
   sorted_files.each do |sorted_file|
@@ -97,16 +97,23 @@ def l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
     end
 
     print cmod.ljust(12)
-    print fs.nlink.to_s.rjust(nlink_brank) + ' '
-    print Etc.getpwuid(fs.uid).name.ljust(uid_brank)
-    print Etc.getgrgid(fs.gid).name.ljust(gid_brank)
-    print fs.size.to_s.rjust(filesize_brank)
-    print MONTH_TABLE[fs.mtime.to_a.slice(4).to_s].rjust(4)
-    print fs.mtime.to_a.slice(3).to_s.rjust(3)
-    print Time.now - fs.mtime < 15_552_000 ? fs.mtime.to_s.slice(11, 5).to_s.rjust(6) : fs.mtime.to_a.slice(5).to_s.rjust(6) + ' '
+    l_disp_t(fs, nlink_brank, uid_brank, gid_brank, filesize_brank)
     print sorted_file
     puts
   end
+end
+
+# lオプションの機能：表示
+def l_disp_t(file_stats, nlink_brank, uid_brank, gid_brank, filesize_brank)
+  print file_stats.nlink.to_s.rjust(nlink_brank)
+  print ' '
+  print Etc.getpwuid(file_stats.uid).name.ljust(uid_brank)
+  print Etc.getgrgid(file_stats.gid).name.ljust(gid_brank)
+  print file_stats.size.to_s.rjust(filesize_brank)
+  print MONTH_TABLE[file_stats.mtime.to_a.slice(4).to_s].rjust(4)
+  print file_stats.mtime.to_a.slice(3).to_s.rjust(3)
+  print Time.now - file_stats.mtime < 15_552_000 ? file_stats.mtime.to_s.slice(11, 5).to_s.rjust(6) : file_stats.mtime.to_a.slice(5).to_s.rjust(6)
+  print ' '
 end
 
 opt = OptionParser.new
