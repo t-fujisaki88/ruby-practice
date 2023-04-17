@@ -75,16 +75,16 @@ def l_option(sorted_files)
     filesize_str_size << fs.size.to_s.size
   end
 
-  nlink_brank = nlink_str_size.max
-  uid_brank = uid_str_size.max + 2
-  gid_brank = gid_str_size.max + 1
-  filesize_brank = filesize_str_size.max + 1
+  nlink_blank = nlink_str_size.max
+  uid_blank = uid_str_size.max + 2
+  gid_blank = gid_str_size.max + 1
+  filesize_blank = filesize_str_size.max + 1
 
-  l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
+  l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
 end
 
 # lオプションの機能：文字列生成
-def l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
+def l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
   # 表示
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
@@ -97,19 +97,19 @@ def l_disp(sorted_files, nlink_brank, uid_brank, gid_brank, filesize_brank)
     end
 
     print cmod.ljust(12)
-    l_disp_t(fs, nlink_brank, uid_brank, gid_brank, filesize_brank)
+    l_disp_t(fs, nlink_blank, uid_blank, gid_blank, filesize_blank)
     print sorted_file
     puts
   end
 end
 
 # lオプションの機能：表示
-def l_disp_t(file_stats, nlink_brank, uid_brank, gid_brank, filesize_brank)
-  print file_stats.nlink.to_s.rjust(nlink_brank)
+def l_disp_t(file_stats, nlink_blank, uid_blank, gid_blank, filesize_blank)
+  print file_stats.nlink.to_s.rjust(nlink_blank)
   print ' '
-  print Etc.getpwuid(file_stats.uid).name.ljust(uid_brank)
-  print Etc.getgrgid(file_stats.gid).name.ljust(gid_brank)
-  print file_stats.size.to_s.rjust(filesize_brank)
+  print Etc.getpwuid(file_stats.uid).name.ljust(uid_blank)
+  print Etc.getgrgid(file_stats.gid).name.ljust(gid_blank)
+  print file_stats.size.to_s.rjust(filesize_blank)
   print MONTH_TABLE[file_stats.mtime.to_a.slice(4).to_s].rjust(4)
   print file_stats.mtime.to_a.slice(3).to_s.rjust(3)
   print Time.now - file_stats.mtime < 15_552_000 ? file_stats.mtime.to_s.slice(11, 5).to_s.rjust(6) : file_stats.mtime.to_a.slice(5).to_s.rjust(6)
