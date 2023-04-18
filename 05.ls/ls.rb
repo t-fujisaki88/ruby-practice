@@ -76,9 +76,9 @@ def l_option(sorted_files)
   end
 
   nlink_blank = nlink_str_size.max
-  uid_blank = uid_str_size.max + 2
-  gid_blank = gid_str_size.max + 1
-  filesize_blank = filesize_str_size.max + 1
+  uid_blank = uid_str_size.max
+  gid_blank = gid_str_size.max
+  filesize_blank = filesize_str_size.max
 
   l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
 end
@@ -108,7 +108,9 @@ def l_disp_t(file_stats, nlink_blank, uid_blank, gid_blank, filesize_blank)
   print file_stats.nlink.to_s.rjust(nlink_blank)
   print ' '
   print Etc.getpwuid(file_stats.uid).name.ljust(uid_blank)
+  print '  '
   print Etc.getgrgid(file_stats.gid).name.ljust(gid_blank)
+  print '  '
   print file_stats.size.to_s.rjust(filesize_blank)
   print MONTH_TABLE[file_stats.mtime.to_a.slice(4).to_s].rjust(4)
   print file_stats.mtime.to_a.slice(3).to_s.rjust(3)
