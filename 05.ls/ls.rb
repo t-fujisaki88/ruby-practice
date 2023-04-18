@@ -128,8 +128,8 @@ opt.on('-r') { |v| params[:r] = v }
 opt.parse!(ARGV)
 
 # -a option
-sorted_files = params[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+files = params[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 # -r option
-sorted_files = params[:r] ? sorted_files.sort.reverse : sorted_files.sort
+sorted_files = params[:r] ? files.sort.reverse : files.sort
 # -l option
 params[:l] ? l_option(sorted_files) : display(sorted_files, calc_row(sorted_files.size))
