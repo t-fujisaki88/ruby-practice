@@ -54,7 +54,7 @@ def display(files, row)
 end
 
 # lオプションの機能：全体
-def l_option(sorted_files)
+def long_format_option(sorted_files)
   # ブロックの合計値
   total = sorted_files.size.times.sum do |i|
     File::Stat.new(sorted_files[i]).blocks.to_i
@@ -80,11 +80,11 @@ def l_option(sorted_files)
   gid_blank = gid_str_size.max
   filesize_blank = filesize_str_size.max
 
-  l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
+  long_format_option_make_contents(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
 end
 
 # lオプションの機能：文字列生成
-def l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
+def long_format_option_make_contents(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
   # 表示
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
@@ -97,14 +97,13 @@ def l_disp(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
     end
 
     print cmod.ljust(12)
-    l_disp_t(fs, nlink_blank, uid_blank, gid_blank, filesize_blank)
-    print sorted_file
-    puts
+    long_format_option_display(fs, nlink_blank, uid_blank, gid_blank, filesize_blank)
+    puts sorted_file
   end
 end
 
 # lオプションの機能：表示
-def l_disp_t(file_stats, nlink_blank, uid_blank, gid_blank, filesize_blank)
+def long_format_option_display(file_stats, nlink_blank, uid_blank, gid_blank, filesize_blank)
   print file_stats.nlink.to_s.rjust(nlink_blank)
   print ' '
   print Etc.getpwuid(file_stats.uid).name.ljust(uid_blank)
@@ -132,4 +131,4 @@ files = params[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 # -r option
 sorted_files = params[:r] ? files.sort.reverse : files.sort
 # -l option
-params[:l] ? l_option(sorted_files) : display(sorted_files, calc_row(sorted_files.size))
+params[:l] ? long_format_option(sorted_files) : display(sorted_files, calc_row(sorted_files.size))
