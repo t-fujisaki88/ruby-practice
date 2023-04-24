@@ -6,7 +6,7 @@ require 'etc'
 # 表示列の最大数をココで変更
 COLUMN = 3
 
-CMOD_TABLE = {
+MODE_TABLE = {
   '01' => 'p',
   '02' => 'c',
   '04' => 'd',
@@ -90,21 +90,21 @@ def long_format_option_make_contents(sorted_files, blank)
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
     # 権限
-    cmod = ''
+    mode = ''
     permission_num = format('%06d', fs.mode.to_s(8)).split('')
     permission_num = [permission_num[0..1].join, permission_num[2..5]].flatten
     permission_num.each do |permission_part|
-      cmod += CMOD_TABLE[permission_part]
+      mode += MODE_TABLE[permission_part]
     end
 
-    long_format_option_display(fs, blank, cmod)
+    long_format_option_display(fs, blank, mode)
     puts sorted_file
   end
 end
 
 # lオプションの機能：表示
-def long_format_option_display(file_stats, blank, cmod)
-  print cmod.ljust(12)
+def long_format_option_display(file_stats, blank, mode)
+  print mode.ljust(12)
   print file_stats.nlink.to_s.rjust(blank[:nlink].to_i)
   print ' '
   print Etc.getpwuid(file_stats.uid).name.ljust(blank[:uid].to_i)
