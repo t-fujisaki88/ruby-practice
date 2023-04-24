@@ -80,11 +80,12 @@ def long_format_option(sorted_files)
   gid_blank = gid_str_size.max
   filesize_blank = filesize_str_size.max
 
-  long_format_option_make_contents(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
+  blank = {"nlink": nlink_blank, "uid": uid_blank, "gid": gid_blank, "filesize": filesize_blank}
+  long_format_option_make_contents(sorted_files, blank)
 end
 
 # lオプションの機能：文字列生成
-def long_format_option_make_contents(sorted_files, nlink_blank, uid_blank, gid_blank, filesize_blank)
+def long_format_option_make_contents(sorted_files, blank)
   # 表示
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
@@ -96,21 +97,21 @@ def long_format_option_make_contents(sorted_files, nlink_blank, uid_blank, gid_b
       cmod += CMOD_TABLE[permission_part]
     end
 
-    print cmod.ljust(12)
-    long_format_option_display(fs, nlink_blank, uid_blank, gid_blank, filesize_blank)
+    long_format_option_display(fs, blank, cmod)
     puts sorted_file
   end
 end
 
 # lオプションの機能：表示
-def long_format_option_display(file_stats, nlink_blank, uid_blank, gid_blank, filesize_blank)
-  print file_stats.nlink.to_s.rjust(nlink_blank)
+def long_format_option_display(file_stats, blank, cmod)
+  print cmod.ljust(12)
+  print file_stats.nlink.to_s.rjust(blank[:nlink].to_i)
   print ' '
-  print Etc.getpwuid(file_stats.uid).name.ljust(uid_blank)
+  print Etc.getpwuid(file_stats.uid).name.ljust(blank[:uid].to_i)
   print '  '
-  print Etc.getgrgid(file_stats.gid).name.ljust(gid_blank)
+  print Etc.getgrgid(file_stats.gid).name.ljust(blank[:gid].to_i)
   print '  '
-  print file_stats.size.to_s.rjust(filesize_blank)
+  print file_stats.size.to_s.rjust(blank[:filesize].to_i)
   print MONTH_TABLE[file_stats.mtime.to_a.slice(4).to_s].rjust(4)
   print file_stats.mtime.to_a.slice(3).to_s.rjust(3)
   print Time.now - file_stats.mtime < 15_552_000 ? file_stats.mtime.to_s.slice(11, 5).to_s.rjust(6) : file_stats.mtime.to_a.slice(5).to_s.rjust(6)
