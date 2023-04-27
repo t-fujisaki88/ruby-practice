@@ -6,7 +6,7 @@ require 'etc'
 # 表示列の最大数をココで変更
 COLUMN = 3
 
-CMOD_TABLE = {
+MODE_TABLE = {
   '01' => 'p',
   '02' => 'c',
   '04' => 'd',
@@ -53,23 +53,15 @@ def display(files, row)
   end
 end
 
-opt = OptionParser.new
-params = {}
-opt.on('-l') { |v| params[:l] = v }
-opt.parse!(ARGV)
-
-# display files
-sorted_files = Dir.glob('*').sort
-
-# l オプション機能
-if params[:l]
+# lオプションの機能：全体
+def long_format_option(sorted_files)
   # ブロックの合計値
   total = sorted_files.size.times.sum do |i|
     File::Stat.new(sorted_files[i]).blocks.to_i
   end
   puts "total #{total}"
 
-  # 各項目の最大文字数を求める
+  # 各項目の最大文字数を求めるための一時記憶配列
   nlink_str_size = []
   uid_str_size = []
   gid_str_size = []
@@ -83,35 +75,61 @@ if params[:l]
     filesize_str_size << fs.size.to_s.size
   end
 
-  nlink_brank = nlink_str_size.max
-  uid_brank = uid_str_size.max + 2
-  gid_brank = gid_str_size.max + 1
-  filesize_brank = filesize_str_size.max + 1
+  nlink_blank = nlink_str_size.max
+  uid_blank = uid_str_size.max
+  gid_blank = gid_str_size.max
+  filesize_blank = filesize_str_size.max
 
+  blank = {"nlink": nlink_blank, "uid": uid_blank, "gid": gid_blank, "filesize": filesize_blank}
+  long_format_option_make_contents(sorted_files, blank)
+end
+
+# lオプションの機能：文字列生成
+def long_format_option_make_contents(sorted_files, blank)
   # 表示
   sorted_files.each do |sorted_file|
     fs = File::Stat.new(sorted_file)
     # 権限
-    cmod = ''
+    mode = ''
     permission_num = format('%06d', fs.mode.to_s(8)).split('')
     permission_num = [permission_num[0..1].join, permission_num[2..5]].flatten
     permission_num.each do |permission_part|
-      cmod += CMOD_TABLE[permission_part]
+      mode += MODE_TABLE[permission_part]
     end
 
-    print cmod.ljust(12)
-    print fs.nlink.to_s.rjust(nlink_brank)
-    print ' '
-    print Etc.getpwuid(fs.uid).name.ljust(uid_brank)
-    print Etc.getgrgid(fs.gid).name.ljust(gid_brank)
-    print fs.size.to_s.rjust(filesize_brank)
-    print MONTH_TABLE[fs.mtime.to_a.slice(4).to_s].rjust(4)
-    print fs.mtime.to_a.slice(3).to_s.rjust(3)
-    print Time.now - fs.mtime < 15_552_000 ? fs.mtime.to_s.slice(11, 5).to_s.rjust(6) : fs.mtime.to_a.slice(5).to_s.rjust(6)
-    print ' '
-    print sorted_file
-    puts
+    long_format_option_display(fs, blank, mode)
+    puts sorted_file
   end
-else
-  display(sorted_files, calc_row(sorted_files.size))
 end
+
+# lオプションの機能：表示
+def long_format_option_display(file_stats, blank, mode)
+  print mode.ljust(12)
+  print file_stats.nlink.to_s.rjust(blank[:nlink].to_i)
+  print ' '
+  print Etc.getpwuid(file_stats.uid).name.ljust(blank[:uid].to_i)
+  print '  '
+  print Etc.getgrgid(file_stats.gid).name.ljust(blank[:gid].to_i)
+  print '  '
+  print file_stats.size.to_s.rjust(blank[:filesize].to_i)
+  print MONTH_TABLE[file_stats.mtime.to_a.slice(4).to_s].rjust(4)
+  print file_stats.mtime.to_a.slice(3).to_s.rjust(3)
+  print Time.now - file_stats.mtime < 15_552_000 ? file_stats.mtime.to_s.slice(11, 5).to_s.rjust(6) : file_stats.mtime.to_a.slice(5).to_s.rjust(6)
+  print ' '
+end
+
+opt = OptionParser.new
+params = {}
+
+opt.on('-a') { |v| params[:a] = v }
+opt.on('-l') { |v| params[:l] = v }
+opt.on('-r') { |v| params[:r] = v }
+
+opt.parse!(ARGV)
+
+# -a option
+files = params[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+# -r option
+sorted_files = params[:r] ? files.sort.reverse : files.sort
+# -l option
+params[:l] ? long_format_option(sorted_files) : display(sorted_files, calc_row(sorted_files.size))
